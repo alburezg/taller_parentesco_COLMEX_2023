@@ -1,0 +1,1 @@
+For uploading .Rdata files run: load("file_path"). If the file contains more than one object (like "SWEhist_matrices.Rdata") all objects will be loaded.
