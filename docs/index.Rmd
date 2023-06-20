@@ -308,7 +308,7 @@ ggplot(aes(mpg, wt, colour = hp)) +
 
 > Aquí te hemos mostrado algunos paquetes y funciones que nos gustan, ¡pero en los ejercicios puedes usar las herramientas que desees!
 
-## Vie 5
+## Lunes 24
 
 ### Cómo crear una matriz subdiagonal
 
@@ -382,7 +382,7 @@ var_n_dagger <- n2_dagger - n1_dagger * n1_dagger
 ```
 
 
-## Lun 8
+## Martes 25
 
 Veremos cómo traducir la teoría de los modelos de parentesco de **una clase de edad clasificada por tiempo invariable y un solo sexo** a código, cómo utilizar el paquete `DemoKin` para una implementación sin problemas, y finalmente haremos algunos ejercicios. Secciones:
 
@@ -761,7 +761,7 @@ ejemplo_a_mano$kin_summary %>% filter(kin == "gm") %>% pull(count_living)
 ```
 
 
-## Martes 9
+## Miercoles 26
 
 Hoy implementaremos la teoría de modelos de parentesco de un solo sexo y tiempo variable clasificados por edad en R, mostraremos cómo utilizar el paquete `DemoKin` para ese propósito y haremos algunos ejercicios.
 
@@ -1270,7 +1270,7 @@ comparison_by_hand_demokin <- D_table %>%
 sum(comparison_by_hand_demokin$dif)
 ```
 
-## Miércoles 10
+## Jueves 27
 
 Durante esta sección, utilizaremos `DemoKin` para modelos de parentesco de dos sexos clasificados por edad y realizaremos algunos ejercicios.
 
@@ -1795,7 +1795,7 @@ toy_ex$kin_summary %>% filter(kin == "d") %>%
 ```
 </details>
 
-## Jueves 11
+## Viernes 28
 
 Durante esta sección veremos cómo aplicar los **modelos de parentesco de un solo sexo clasificados por etapa y edad invariantes en el tiempo** en R utilizando el paquete `DemoKin` y realizaremos algunos ejercicios.
 
@@ -2130,7 +2130,7 @@ demokin_multistage_summary %>% filter(kin == "m") %>% arrange(stage_kin, age_foc
 
 ## Soluciones
 
-### Lunes 8
+### Martes 25
 
 **1.1**
 <details><summary>Mostrar</summary>
@@ -2239,7 +2239,7 @@ by_hand_example$kin_summary %>% filter(kin == "gm") %>% pull(count_living)
 ```
 </details>
 
-### Martes 9
+### Miercoles 26
 
 **1**
 <details><summary>Mostrar</summary>
@@ -2327,7 +2327,7 @@ excess_bereav_indic
 ```
 </details>
 
-### Wedn 10
+### Jueves 27
 
 **E1** 
 <details><summary>Show</summary>
@@ -2539,7 +2539,7 @@ ggpubr::ggarrange(kolk_plot + xlab("Kolk"), plot_model1, plot_model2, plot_model
 ```
 </details>
 
-### Jueves 10
+### Viernes 28
 
 **E1**
 <details><summary>Show</summary>

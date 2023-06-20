@@ -9,8 +9,8 @@ Colegio de Mexico, CDMX, 24-28 Junio 2023
 
 Instructor: 
 
-Diego Alburez Gutierrez [pagina web](www.alburez.me)
+Diego Alburez Gutierrez (www.alburez.me)
 
-Research Group Kinship Inequalities
+[Research Group Kinship Inequalities](https://www.demogr.mpg.de/en/research_6120/independent_research_groups_11668/kinship_inequalities_10703/)
 
 Max Planck Institute for Demographic Research
