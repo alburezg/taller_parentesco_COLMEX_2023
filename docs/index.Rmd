@@ -233,9 +233,7 @@ bdiag(A, B) %>% as.matrix()
 
 - Matriz de permutación de vec
 
-Ve
-
-amos cómo vectorizar una matriz con dimensión $s=2$ (filas, podrían ser estados de salud) por $w=4$ (columnas, clases de edad), y qué significa aplicar la matriz de permutación de vec (o conmutación).
+Veamos cómo vectorizar una matriz con dimensión $s=2$ (filas, podrían ser estados de salud) por $w=4$ (columnas, clases de edad), y qué significa aplicar la matriz de permutación de vec (o conmutación).
 
 ```{r}
 # crear matriz A con 2 etapas y 4 edades
@@ -295,9 +293,7 @@ mtcars %>%
 ```
 
 
-Estas son las funciones básicas que utilizaremos para mostrar ejemplos. Consulta más sobre la transformación de datos con [dplyr](https://dplyr.tidyverse.org/articles/programming.html) y el remodelado con [tidyr](https://tidyr.tidyverse.org/articles/pivot.html) si tienes cur
-
-iosidad. Por último, el paquete [ggplot2](https://ggplot2.tidyverse.org/) se utilizará para visualizar los resultados. Un ejemplo muy básico:
+Estas son las funciones básicas que utilizaremos para mostrar ejemplos. Consulta más sobre la transformación de datos con [dplyr](https://dplyr.tidyverse.org/articles/programming.html) y el remodelado con [tidyr](https://tidyr.tidyverse.org/articles/pivot.html) si tienes curiosidad. Por último, el paquete [ggplot2](https://ggplot2.tidyverse.org/) se utilizará para visualizar los resultados. Un ejemplo muy básico:
 
 ```{r}
 library(ggplot2)
@@ -676,6 +672,13 @@ swe_asfr_2015 <- DemoKin::swe_asfr[,"2015"]
 swe_2015 <- kin(U = swe_surv_2015, f = swe_asfr_2015, time_invariant = TRUE)
 ```
 
+Vamos a crear un vector para combinar algunos tipos de parientes (p. ej, queremos que 'hermanas menores' y 'hermanas mayores' sean simplemente 'hermanas'): 
+
+```{r}
+consolidate_vec <- c("c", "c", "d", "gd", "ggd", "ggm", "gm", "m", "n", "n", "a", "a", "s", "s")
+names(consolidate_vec) <- c("coa", "cya", "d", "gd", "ggd", "ggm", "gm", "m", "nos", "nys", "oa", "ya", "os", "ys")
+```
+
 ##### 3.1. Parientes vivos
 
 Ahora, visualicemos cómo cambia el número esperado de hijas, hermanas, primas, etc., a lo largo de la vida de Focal. Utiliza `DemoKin::rename_kin()` con nombres completos para identificar cada tipo de pariente.
@@ -684,12 +687,16 @@ Ahora, visualicemos cómo cambia el número esperado de hijas, hermanas, primas,
 
 ```{r, fig.height=6, fig.width=8}
 swe_2015$kin_summary %>%
-  rename_kin() %>%
+  # Las proximas dos lineas simplemente agrupan parientes menore y mayores
+  mutate(kin = consolidate_vec[kin]) %>% 
+  summarise(count_living = sum(count_living), .by = c(age_focal, kin)) %>% 
+  # rename_kin convierte codigos para identificar a parientes a los nombres correspondientes
+  rename_kin() %>% 
   ggplot() +
   geom_line(aes(age_focal, count_living))  +
   labs(x = "Edad de Focal") +
   theme_bw() +
-  facet_wrap(~kin)
+  facet_wrap(~kin_label)
 ```
 
 > Puedes pensar en los resultados como análogos a la esperanza de vida (es decir, los años esperados de vida para una cohorte sintética que experimenta un conjunto dado de tasas de mortalidad), un indicador de período. Una diferencia clave es que la medida $e_x$ es independiente de lo que sucedió en años anteriores. La estructura del parentesco, por otro lado, depende de condiciones anteriores, como la distribución de edades de la madre de Focal.
@@ -699,7 +706,11 @@ Reunamos todas las líneas anteriores en un gráfico de áreas para estudiar la 
 ```{r}
 swe_2015$kin_summary %>%
   select(age_focal, kin, count_living) %>%
-  rename_kin() %>%
+  # Las proximas dos lineas simplemente agrupan parientes menore y mayores
+  mutate(kin = consolidate_vec[kin]) %>% 
+  summarise(count_living = sum(count_living), .by = c(age_focal, kin)) %>% 
+  # rename_kin convierte codigos para identificar a parientes a los nombres correspondientes
+  rename_kin() %>% 
   ggplot(aes(x = age_focal, y = count_living)) +
   geom_area(aes(fill = kin_label), colour = "black") +
   labs(x = "Edad de Focal", y = "Número de parientes femeninas vivas") +
@@ -721,14 +732,18 @@ Por ejemplo, cuando Focal tiene 35 años, el patrón de edad de sus parientes es
 
 ```{r, fig.height=6, fig.width=8}
 swe_2015$kin_full %>%
-  DemoKin::rename_kin() %>%
+  # Las proximas dos lineas simplemente agrupan parientes menore y mayores
+  mutate(kin = consolidate_vec[kin]) %>% 
+  summarise(living = sum(living), .by = c(age_focal, age_kin, kin)) %>% 
+  # rename_kin convierte codigos para identificar a parientes a los nombres correspondientes
+  rename_kin() %>% 
   filter(age_focal == 35) %>%
   ggplot() +
   geom_line(aes(age_kin, living)) +
   geom_vline(xintercept = 35, color=2) +
   labs(y = "Número esperado de parientes vivos") +
   theme_bw() +
-  facet_wrap(~kin)
+  facet_wrap(~kin_label)
 ```
 
 **Responde**: Considera la distribución por edad de cada tipo de pariente en relación con la edad actual de Focal (es decir, 35). ¿Cuáles parientes son más jóvenes y cuáles son mayores? ¿Tiene esto sentido intuitivamente?
@@ -742,6 +757,171 @@ swe_2015$kin_summary %>%
   filter(age_focal == 35) %>%
   select(kin, count = count_living) %>%
   plot_diagram(rounding = 2)
+```
+
+##### 3.3. Familiares fallecidos
+
+Nos hemos centrado en los familiares vivos, pero ¿qué pasa con los parientes que han fallecido durante su vida?
+La salida de `kin` también incluye información sobre las muertes de familiares experimentadas por Focal. No vimos la implementación del código en R, pero se requiere una mínima modificación adicional para obtener el número de muertes familiares experimentadas (básicamente implementar las ecuaciones 49 y 50 en @caswell_formal_2019, echa un vistazo a `DemoKin` en cualquier caso o pregúntanos si tienes curiosidad).
+Comenzamos considerando el número de muertes de familiares experimentadas por Focal a cada edad.
+En otras palabras, el número no acumulativo de muertes en la familia que Focal experimenta a una determinada edad.
+
+**Respuesta**: ¿A qué edad puede Focal esperar experimentar más muertes de familiares? ¿De qué tipo de familiares? ¿Por qué vemos *ondas de duelo* a ciertas edades (es decir, edades en las que Focal experimenta más pérdidas familiares)?
+
+```{r}
+swe_2015$kin_summary %>%
+  filter(age_focal>0) %>%
+  summarise(count = sum(count_dead), .by = c(age_focal, kin)) %>%
+  rename_kin() %>%
+  ggplot(aes(x = age_focal, y = count)) +
+  geom_area(aes(fill = kin_label), colour = "black") +
+  labs(x = "Edad de Focal", y = "Número de muertes de familiares experimentadas a cada edad") +
+  coord_cartesian(ylim = c(0, 0.086)) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+Ahora, combinamos todos los tipos de familiares para mostrar la carga acumulativa de muertes familiares para un miembro promedio de la población que sobrevive hasta cada edad:
+
+```{r}
+swe_2015$kin_summary %>%
+  summarise(count = sum(count_cum_dead), .by = c(age_focal, kin)) %>%
+  rename_kin() %>%
+  ggplot(aes(x = age_focal, y = count)) +
+  geom_area(aes(fill = kin_label), colour = "black") +
+  labs(x = "Edad de Focal", y = "Número de muertes de familiares experimentadas (acumulativo)") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+Un miembro de la población de 15, 50 y 65 años habrá experimentado, en promedio, esta carga de experiencia de muerte (considerando todos los tipos de familiares con el mismo peso):
+
+```{r}
+swe_2015$kin_summary %>%
+  group_by(age_focal) %>%
+  summarise(count = sum(count_cum_dead)) %>%
+  filter(age_focal %in% c(15, 50, 65))
+```
+
+Hemos echado un vistazo a lo que se puede hacer con `DemoKin`. Ahora te pediremos que te ensucies las manos con algunos ejercicios.
+
+### Ejercicios {#exercises_mon8}
+
+> Todos los ejercicios se pueden completar utilizando los conjuntos de datos incluidos en `DemoKin`. 
+
+#### 1. Disponibilidad y pérdida de familiares
+
+Utiliza `DemoKin` asumiendo tasas invariantes en el tiempo desde 1910 en la población sueca femenina y responde:
+
+**1.1**: ¿Cuál es el número esperado de hijos sobrevivientes para una mujer promedio de 35 años?
+
+```{r, eval= F, include=F}
+# Escribe tu código aquí
+swe_surv_1910 <- DemoKin::swe_px[,"1910"]
+swe_asfr_1910 <- DemoKin::swe_asfr[,"1910"]
+swe_1910 <- kin(p = swe_surv_1910, f = swe_asfr_1910, time_invariant = TRUE)
+swe_1910$kin_summary %>%
+  summarise(count_living = round(sum(count_living),3), .by = c(kin, age_focal)) %>%
+  filter(age_focal == 35, kin == "d")
+```
+
+**1.2**: ¿Cuál es el número esperado de madres sobrevivientes para la misma mujer?
+
+```{r, eval= F, include=F}
+# Escribe tu código aquí
+swe_1910$kin_summary %>%
+  summarise(count_living = round(sum(count_living),3), .by = c(kin, age_focal)) %>%
+  filter(age_focal == 35, kin == "m")
+```
+
+**1.3**: Grafica el diagrama 'Keyfitz' para esa mujer y compáralo visualmente con el de la sección 3.2 (que se basaba en tasas del año 2015).
+
+```{r, eval= F, include=F, fig.height=10, fig.width=12}
+# Escribe tu código aquí
+swe_1910$kin_summary %>%
+  filter(age_focal == 35) %>%
+  select(kin, count = count_living) %>%
+  plot_diagram(rounding = 2)
+```
+
+**1.4**: ¿Cuál es el número acumulativo de muertes de hijas experimentadas por una mujer promedio que sobrevive hasta los 65 años? Compáralo con el escenario de 2015 creando un marco de datos con las siguientes columnas: `kin`, `loss_1910`, `loss_2015`. ¿Cuál de las dos Focals (una experimentando las tasas de 1910 y la otra las tasas de 2015) ha perdido más hijas a los 65 años? ¿Cuántas hijas más ha perdido?
+
+```{r, eval= F, include=F}
+# Escribe tu código aquí
+# para todos los familiares en este caso
+swe_1910$kin_summary %>%
+  filter(age_focal == 65, kin == "d") %>%
+  select(age_focal, loss_1910 = count_cum_dead) %>%
+  inner_join(
+    swe_2015$kin_summary %>%
+      filter(age_focal == 65, kin == "d") %>%
+      select(age_focal, loss_2015 = count_cum_dead))
+```
+
+#### 2. Distribución de edades de los familiares
+
+Volviendo a Suecia 2015. La salida de `DemoKin::kin` incluye información sobre la edad promedio de los familiares de Focal (en las columnas `kin_summary$mean_age` y `kin_summary$sd_age`). Por ejemplo, esto nos permite determinar la edad promedio, la desviación estándar y el coeficiente de variación de las hermanas de Focal a lo largo de su vida:
+
+```{r, eval= F, include=F, warning=F, message=F}
+swe_2015$kin_summary %>%
+  filter(kin %in% c("os", "ys")) %>%
+  rename_kin() %>%
+  select(kin, age_focal, mean_age, sd_age) %>%
+  mutate(`sd_age/mean_age` = sd_age/mean_age) %>%
+  pivot_longer(mean_age:`sd_age/mean_age`) %>%
+  ggplot(aes(x = age_focal, y = value, colour = kin)) +
+  geom_line() +
+  facet_wrap(~name, scales = "free") +
+  labs(y = "Edad promedio de la(s) hermana(s)") +
+  theme_bw()
+```
+
+Usando solo la salida en bruto en `kin_full`:
+
+**2.1**: Obtiene la edad promedio de la madre, hija y hermanas vivas para una mujer de 35 años.
+
+```{r, eval= F, include=F}
+# Escribe tu código aquí
+mean_ages_2015 <- swe_2015$kin_full %>%
+  filter(age_focal == 35) %>%
+  summarise(mean_age = sum(age_kin*living)/sum(living),
+            .by = c(kin))
+mean_ages_2015
+```
+
+**2.2**: Haz lo mismo con las tasas de 1910 y compara ambos conjuntos de resultados visualmente.
+
+```{r, eval= F, include=F}
+# Escribe tu código aquí
+mean_ages_1910 <- swe_1910$kin_full %>%
+  filter(age_focal == 35) %>%
+  summarise(mean_age = sum(age_kin*living)/sum(living),
+            .by = c(kin))
+# una posible gráfica
+mean_ages_1910 %>%
+  mutate(year = 1910) %>%
+  bind_rows(
+    mean_ages_2015 %>% mutate(year = 2015)) %>%
+  ggplot() +
+  geom_bar(aes(kin, mean_age, fill=factor(year)),
+           stat = "identity", position = "dodge")
+```
+
+**2.3**: La 'Generación Sándwich' se refiere a las personas que están atrapadas entre padres mayores frágiles e hijos jóvenes dependientes, y se asume que tienen responsabilidades simultáneas de cuidado para múltiples generaciones, lo que potencialmente limita su capacidad para proporcionar cuidado [@alburezgutierrez_sandwich_2021].
+
+Para este ejercicio, consideramos niveles de 'sándwich' al observar el número de hijas 'dependientes' vivas (de 15 años o menos) y madres 'dependientes' vivas (de 75 años o más) a lo largo de la vida de Focal. Utiliza `DemoKin` asumiendo tasas invariantes en el tiempo a los niveles de 2015 en Suecia y una población exclusivamente femenina.
+**Respuesta**: ¿A qué edad se encuentra Focal más *apretada* (es decir, a qué edad tiene simultáneamente el mayor número de hijas y madres dependientes)? Si graficas el total de 'sándwich' por edad, obtendrás 500 puntos. Por 1,000 puntos, agrega colores a cada tipo de pariente. 
+
+```{r, eval= F, include=F}
+swe_2015$kin_full %>%
+  group_by(age_focal) %>%
+  summarise(daughter = sum(living[kin=='d' & age_kin<=15]),
+            mother = sum(living[kin=='m' & age_kin>=75]),
+            sandwiched_level = daughter + mother) %>%
+  pivot_longer(cols = daughter:sandwiched_level) %>%
+  ggplot()+
+  geom_line(aes(age_focal, value, col=name))+
+  scale_x_continuous(labels = seq(0,100,5), breaks = seq(0,100,5))
 ```
 
 #### 3. Compare DemoKin con cálculos 'a mano'
@@ -1995,7 +2175,7 @@ D_low[row(D_low)-1 == col(D_low)] <- p_low[-ages]
 D_high[row(D_high)-1 == col(D_high)] <- p_high[-ages]
 D <- list(D_low, D_high)
 
-# fertilidad de las crías en cada edad. Todo recién nacido tiene educación baja, sin importar el estado de Focal
+# fertilidad de las hijas en cada edad. Todo recién nacido tiene educación baja, sin importar el estado de Focal
 F. <- lapply(1:ages, function(x){
   matrix(c(f_low[x],0,f_high[x],0),2, 2)
   })
@@ -2100,7 +2280,7 @@ f <- F. <- lapply(1:ages, function(x){
   })
 ```
 
-Debes establecer `birth_female = 1` porque la fertilidad ya se refiere a las crías femeninas. Dado que el análisis no es de distribución de paridad, establece `parity = FALSE`.
+Debes establecer `birth_female = 1` porque la fertilidad ya se refiere a las hijas. Dado que el análisis no es de distribución de paridad, establece `parity = FALSE`.
 
 <details><summary>Mostrar</summary>
 ```{r}
