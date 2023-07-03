@@ -70,7 +70,7 @@ install.packages("DemoKin")
 Otros paquetes que serán útiles son:
 
 ```{r, eval=FALSE}
-packages_needed <- c("tidyverse", "matrixcalc", "Matrix") 
+packages_needed <- c("tidyverse", "matrixcalc", "Matrix", "expm") 
 packages_needed_nothaving <- packages_needed[!packages_needed %in% installed.packages()]
 for(lib in packages_needed_nothaving) install.packages(lib,dependencies=TRUE)
 ```
@@ -129,9 +129,7 @@ as.matrix(a_vector)
 dim(as.matrix(a_vector))
 ```
 
-> Verificar las dimensiones es una buena práctica para validar si dos objetos pueden ser sumados o multiplicados (y en qué orden). Sab
-
-es que algo relacionado con eso está sucediendo incorrectamente cuando ves este mensaje "non-conformable arguments".
+> Verificar las dimensiones es una buena práctica para validar si dos objetos pueden ser sumados o multiplicados (y en qué orden). Sabes que algo relacionado con eso está sucediendo incorrectamente cuando ves este mensaje "non-conformable arguments".
 
 - Suma
 
@@ -216,6 +214,7 @@ Con el paquete `Matrix`, tenemos el [producto de Kronecker](https://en.wikipedia
 
 ```{r}
 library(Matrix)
+library(dplyr)
 A <- matrix(1:4, nrow = 2, ncol = 2)
 B <- matrix(11:14, nrow = 2, ncol = 2)
 A
@@ -1108,9 +1107,7 @@ kin(p = swe_px,
 
 #### 2. Muerte de parientes
 
-La pérdida de parientes puede tener graves consecuencias para los familiares en
-
- duelo, ya que afecta, por ejemplo, la provisión de apoyo de cuidado y las transferencias intergeneracionales a lo largo de la vida. La función `kin` proporciona información sobre el número de parientes perdidos por Focal durante su vida, almacenado en la columna `kin_summary$count_cum_death`. El siguiente gráfico compara los patrones de pérdida de parientes para las cohortes de 1910 y 1960.
+La pérdida de parientes puede tener graves consecuencias para los familiares en duelo, ya que afecta, por ejemplo, la provisión de apoyo de cuidado y las transferencias intergeneracionales a lo largo de la vida. La función `kin` proporciona información sobre el número de parientes perdidos por Focal durante su vida, almacenado en la columna `kin_summary$count_cum_death`. El siguiente gráfico compara los patrones de pérdida de parientes para las cohortes de 1910 y 1960.
 
 <!-- (*free* scale in this grid plots can be confusing some times when comparing counts with non similar magnitudes). -->
 
@@ -1253,9 +1250,7 @@ E.1.3$kin_summary %>%
 
 La pandemia de Covid ha estado relacionada con una ola de pérdidas de parientes en algunos países [@verdery_tracking_2020;@Snyder2022]. Usaremos `DemoKin` para aproximar la magnitud de este 'duelo excesivo' (es decir, muertes de parientes que no se habrían experimentado en ausencia de la pandemia). Para esto, procederá en tres pasos:
 
-1. Necesitar
-
-á un 'escenario base': ¿cómo habría sido la mortalidad en 2020 y 2021 en ausencia de COVID? Cree un escenario contrafáctico 'no covid' asumiendo que los niveles de mortalidad observados en 2019 (es decir, antes de la pandemia) estuvieran en vigor durante el período 2020-2021. (También puede crear líneas de base más sofisticadas si lo desea).
+1. Necesitará un 'escenario base': ¿cómo habría sido la mortalidad en 2020 y 2021 en ausencia de COVID? Cree un escenario contrafáctico 'no covid' asumiendo que los niveles de mortalidad observados en 2019 (es decir, antes de la pandemia) estuvieran en vigor durante el período 2020-2021. (También puede crear líneas de base más sofisticadas si lo desea).
 2. En segundo lugar, ejecute dos modelos de parentesco variantes en el tiempo: uno 'realista' que utiliza las tasas empíricas de mortalidad y fertilidad para el período de 1950:2021. El modelo 'contrapuesto' es equivalente al 'realista' excepto que utiliza las tasas de mortalidad de 2019 para el período de 2020:2021.
 3. Estime la diferencia entre el número de parientes vivos para un Individuo focal de 60 años en los escenarios 'realista' y 'contrapuesto' para el año 2021. Una forma intuitiva de pensar en esto:
 
@@ -1672,9 +1667,7 @@ arg_asfr_females <- data_females %>%
   as.matrix()
 arg_surv_females <- data_females %>%
   select(age, year, px) %>%
-  pivot
-
-_wider(names_from = year, values_from = px) %>%
+  pivot_wider(names_from = year, values_from = px) %>%
   select(-age) %>%
   as.matrix()
 arg_surv_males <- data_males %>%
