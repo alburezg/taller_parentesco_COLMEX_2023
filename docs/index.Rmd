@@ -303,8 +303,6 @@ ggplot(aes(mpg, wt, colour = hp)) +
 
 > Aquí te hemos mostrado algunos paquetes y funciones que nos gustan, ¡pero en los ejercicios puedes usar las herramientas que desees!
 
-## Lunes 24
-
 ### Cómo crear una matriz subdiagonal
 
 Con $w$ edades y $p$ el vector de probabilidades de supervivencia...
@@ -377,7 +375,7 @@ var_n_dagger <- n2_dagger - n1_dagger * n1_dagger
 ```
 
 
-## Martes 25
+## Lunes 24
 
 Veremos cómo traducir la teoría de los modelos de parentesco de **una clase de edad clasificada por tiempo invariable y un solo sexo** a código, cómo utilizar el paquete `DemoKin` para una implementación sin problemas, y finalmente haremos algunos ejercicios. Secciones:
 
@@ -939,7 +937,7 @@ Esta es la esencia de la proyección de parentesco para modelos unisexo y sin ca
 
 <!-- Hemos implementado todos estos cálculos en el paquete `Demokin`. Echemos un vistazo a eso ahora. -->
 
-## Miercoles 26
+## Martes 25
 
 Hoy implementaremos la teoría de modelos de parentesco de un solo sexo y tiempo variable clasificados por edad en R, mostraremos cómo utilizar el paquete `DemoKin` para ese propósito y haremos algunos ejercicios.
 
@@ -1444,7 +1442,7 @@ comparison_by_hand_demokin <- D_table %>%
 sum(comparison_by_hand_demokin$dif)
 ```
 
-## Jueves 27
+## Miercoles 26
 
 Durante esta sección, utilizaremos `DemoKin` para modelos de parentesco de dos sexos clasificados por edad y realizaremos algunos ejercicios.
 
@@ -1969,7 +1967,7 @@ toy_ex$kin_summary %>% filter(kin == "d") %>%
 ```
 </details>
 
-## Viernes 28
+## Jueves 27
 
 Durante esta sección veremos cómo aplicar los **modelos de parentesco de un solo sexo clasificados por etapa y edad invariantes en el tiempo** en R utilizando el paquete `DemoKin` y realizaremos algunos ejercicios.
 
@@ -1977,7 +1975,7 @@ Durante esta sección veremos cómo aplicar los **modelos de parentesco de un so
 
 - [Ejercicios](#ejercicios_jueves11)
 
-- [A mano](#manualmente_jueves11)
+- [A mano](#by_hand_fr11)
 
 ### Usando DemoKin {#by_hand_thurs11}
 
@@ -2131,7 +2129,7 @@ Ahora, con su país, realice los mismos pasos y luego **responda**:
 
 **E3**. Elija un gráfico en el artículo de Caswell (2020) e intente reproducirlo.
 
-### A mano {#by_hand_thurs11}
+### A mano {#by_hand_fr11}
 
 Continuamos estudiando la misma población femenina, pero ahora tenemos acceso a su nivel educativo y su fertilidad y mortalidad diferencial. Esta población tiene 2 etapas en la educación ($s=2$): baja y alta.
 
@@ -2304,7 +2302,7 @@ demokin_multistage_summary %>% filter(kin == "m") %>% arrange(stage_kin, age_foc
 
 ## Soluciones
 
-### Martes 25
+#### Lunes 24
 
 **1.1**
 <details><summary>Mostrar</summary>
@@ -2413,7 +2411,7 @@ by_hand_example$kin_summary %>% filter(kin == "gm") %>% pull(count_living)
 ```
 </details>
 
-### Miercoles 26
+### Martes 25
 
 **1**
 <details><summary>Mostrar</summary>
@@ -2501,7 +2499,7 @@ excess_bereav_indic
 ```
 </details>
 
-### Jueves 27
+### Miercoles 26
 
 **E1** 
 <details><summary>Show</summary>
@@ -2713,7 +2711,7 @@ ggpubr::ggarrange(kolk_plot + xlab("Kolk"), plot_model1, plot_model2, plot_model
 ```
 </details>
 
-### Viernes 28
+### Jueves 27
 
 **E1**
 <details><summary>Show</summary>
