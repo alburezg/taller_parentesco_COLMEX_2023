@@ -25,20 +25,13 @@ library(kableExtra)
 Este sitio web contiene todos los materiales "prácticos" para el taller "La demografía del parentesco: una introducción práctica" ofrecido en el Colegio de Mexico (24-28 Junio 2023).
 Aquí encontrarás recursos y herramientas prácticas para aplicar la teoría a tus propios objetivos de investigación.
 
-Cada día, tendremos sesiones prácticas de laboratorio en R en las que implementaremos el contenido teórico del curso.
-Esto incluirá realizar cálculos "a mano" (es decir, desde cero) y, más adelante, utilizar el paquete `DemoKin` para una implementación más conveniente.
 Los ejercicios prácticos te ayudarán a comprender cómo funciona `DemoKin` y te proporcionarán las herramientas para personalizar el código según tus propias investigaciones, si es necesario.
-En la pestaña "Configuración" de arriba, hemos agregado una breve instrucción para configurar las cosas y familiarizarte con algunas de las funciones que utilizaremos en la parte práctica del curso. ¡Por favor, échale un vistazo!
 
-Algunas cosas útiles que debes saber:
+Algunas cosas útiles:
 
 - El programa actualizado se puede encontrar aquí: https://github.com/alburezg/taller_parentesco_COLMEX_2023/tree/master/syllabus.
 - Encuentra el código fuente de este sitio web en GitHub: https://github.com/alburezg/taller_parentesco_COLMEX_2023.
 - Los datos para los ejercicios se pueden encontrar en: https://github.com/alburezg/taller_parentesco_COLMEX_2023/tree/master/data.
-
-<!-- - Las lecturas requeridas están disponibles en: https://www.dropbox.com/t/iM06GB0D5fXboWYu. Consulta las instrucciones de Hal en el programa. También hay más lecturas en esta carpeta (que Hal actualizará durante el curso): https://www.dropbox.com/transfer/AAAAADHvknkaWSj2fSAOIxVF_YStAYFgv2j3CCUNY7DBX-h3yBJwi9c. -->
-<!-- - Aquí también encontrarás más bibliografía: https://github.com/IvanWilli/matrix_kinship_course_lab/tree/main/bibliography. -->
-<!-- - Puedes descargar las diapositivas del curso desde: https://github.com/IvanWilli/matrix_kinship_course_lab/tree/main/slides. -->
 
 Ten en cuenta que esta página puede *cambiar* durante el curso, así que no te preocupes si notas algunos cambios. Podemos adaptar el contenido en función de nuestra interacción o corregir errores en el código a lo largo del camino.
 
