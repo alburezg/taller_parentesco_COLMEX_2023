@@ -391,7 +391,7 @@ library(ggplot2)
 
 #### 1. Datos incorporados
 
-El paquete `DemoKin` incluye datos de Suecia como ejemplo. Estos datos provienen de la [Base de Datos de Mortalidad Humana](https://www.mortality.org/) y de la [Base de Datos de Fertilidad Humana](https://www.humanfertility.org/).
+El paquete `DemoKin` incluye datos de Suecia como ejemplo. Estos datos provienen de la [Base de Datos de Mortalidad Humana](https://www.mortality.org/) y de la [Base de Datos de Fecundidad Humana](https://www.humanfertility.org/).
 
 Primero, tenemos probabilidades de supervivencia por edad:
 
@@ -400,7 +400,7 @@ data("swe_px", package="DemoKin")
 swe_px[1:5, 1:5]
 ```
 
-Tiene años en las columnas y edades en las filas. Pensamos que desde una perspectiva del usuario podría ser más fácil organizar la entrada en lugar de incluir $U$. Graficar $q_x$ (complemento de $p_x$) en función de la edad para 2015 da:
+Tiene años en las columnas y edades en las filas. Graficar $q_x$ (complemento de $p_x$) en función de la edad para 2015 da:
 
 ```{r, warning=F, message=F}
 swe_px %>%
@@ -412,7 +412,7 @@ swe_px %>%
     scale_y_log10()
 ```
 
-Y las tasas de fertilidad específicas por edad:
+Y las tasas de fecundidad específicas por edad:
 
 ```{r}
 data("swe_asfr", package="DemoKin")
@@ -446,10 +446,10 @@ swe_2015 <- kin(p = swe_surv_2015, f = swe_asfr_2015, time_invariant = TRUE)
 Los principales **argumentos** de la función `kin` son:
 
 - **p**: numérico. Un vector o matriz de probabilidades de supervivencia con filas como edades (y columnas como años en caso de una matriz).
-- **f**: numérico. Lo mismo que **p**, pero para tasas de fertilidad específicas por edad.
+- **f**: numérico. Lo mismo que **p**, pero para tasas de fecundidad específicas por edad.
 - **time_invariant**: lógico. Suponer tasas invariables en el tiempo. Valor predeterminado `TRUE`.
 - **output_kin**: carácter. Tipos de parentesco para devolver: "m" para madre, "d" para hija, ver `demokin_codes`.
-- **birth_female**: numérico. Proporción de nacimientos femeninos. Establecido por defecto como $1/2.04$. Esto multiplica el argumento `f` en algún momento, por lo que en caso de que ya estés utilizando tasas de fertilidad solo para descendencia femenina, este parámetro debe establecerse en 1.
+- **birth_female**: numérico. Proporción de nacimientos femeninos. Establecido por defecto como $1/2.04$. Esto multiplica el argumento `f` en algún momento, por lo que en caso de que ya estés utilizando tasas de fecundidad solo para descendencia femenina, este parámetro debe establecerse en 1.
 
 Los parientes para el argumento `output_kin` se identifican mediante un código único.
 
@@ -499,7 +499,7 @@ Demos más contexto con algunos posibles ejemplos de preguntas de investigación
 
 #### 3. Ejemplo: recuentos de parientes en poblaciones invariables en el tiempo para Suecia en 2015
 
-Siguiendo a Caswell [-@caswell_formal_2019], asumimos una población cerrada de mujeres en la que todas experimentan las tasas de mortalidad y fertilidad de Suecia en 2015 a cada edad a lo largo de su vida. Luego preguntamos:
+Siguiendo a Caswell [-@caswell_formal_2019], asumimos una población cerrada de mujeres en la que todas experimentan las tasas de mortalidad y fecundidad de Suecia en 2015 a cada edad a lo largo de su vida. Luego preguntamos:
 
 > ¿Cómo podemos caracterizar la red de parentesco de un miembro promedio de la población (llamémosla 'Focal')?
 
@@ -510,7 +510,7 @@ Utilicemos los datos pre-cargados de Suecia y volvamos a ejecutar el modelo.
 swe_surv_2015 <- DemoKin::swe_px[,"2015"]
 swe_asfr_2015 <- DemoKin::swe_asfr[,"2015"]
 # Ejecutar el modelo de parentesco
-swe_2015 <- kin(U = swe_surv_2015, f = swe_asfr_2015, time_invariant = TRUE)
+swe_2015 <- kin(p = swe_surv_2015, f = swe_asfr_2015, time_invariant = TRUE)
 ```
 
 Vamos a crear un vector para combinar algunos tipos de parientes (p. ej, queremos que 'hermanas menores' y 'hermanas mayores' sean simplemente 'hermanas'): 
@@ -568,7 +568,7 @@ swe_2015$kin_summary %>%
 
 ##### 3.2. Distribución por edad de los parientes vivos cuando Focal tiene cierta edad
 
-¿Qué edad tienen los parientes de Focal en algunos momentos de la vida de Focal? ¿Qué ve a su alrededor cuando se detiene un momento al cruzar su línea diagonal-Lexis? Utilizando el marco de datos `kin_full`, podemos visualizar la distribución por edad de los parientes de Focal a lo largo de su vida.
+¿Qué edad tienen los parientes de Focal en algunos momentos de la vida de Focal? ¿Qué ve a su alrededor cuando se detiene un momento al cruzar su línea diagonal-Lexis? Utilizando el data frame `kin_full`, podemos visualizar la distribución por edad de los parientes de Focal a lo largo de su vida.
 Por ejemplo, cuando Focal tiene 35 años, el patrón de edad de sus parientes es:
 
 ```{r, fig.height=6, fig.width=8}
@@ -656,47 +656,26 @@ Utiliza `DemoKin` asumiendo tasas invariantes en el tiempo desde 1910 en la pobl
 
 **1.1**: ¿Cuál es el número esperado de hijos sobrevivientes para una mujer promedio de 35 años?
 
-```{r, eval= F, include=F}
+```{r, eval= F, include=T}
 # Escribe tu código aquí
-swe_surv_1910 <- DemoKin::swe_px[,"1910"]
-swe_asfr_1910 <- DemoKin::swe_asfr[,"1910"]
-swe_1910 <- kin(p = swe_surv_1910, f = swe_asfr_1910, time_invariant = TRUE)
-swe_1910$kin_summary %>%
-  summarise(count_living = round(sum(count_living),3), .by = c(kin, age_focal)) %>%
-  filter(age_focal == 35, kin == "d")
 ```
 
 **1.2**: ¿Cuál es el número esperado de madres sobrevivientes para la misma mujer?
 
-```{r, eval= F, include=F}
+```{r, eval= F, include=T}
 # Escribe tu código aquí
-swe_1910$kin_summary %>%
-  summarise(count_living = round(sum(count_living),3), .by = c(kin, age_focal)) %>%
-  filter(age_focal == 35, kin == "m")
 ```
 
 **1.3**: Grafica el diagrama 'Keyfitz' para esa mujer y compáralo visualmente con el de la sección 3.2 (que se basaba en tasas del año 2015).
 
-```{r, eval= F, include=F, fig.height=10, fig.width=12}
+```{r, eval= F, include=T}
 # Escribe tu código aquí
-swe_1910$kin_summary %>%
-  filter(age_focal == 35) %>%
-  select(kin, count = count_living) %>%
-  plot_diagram(rounding = 2)
 ```
 
-**1.4**: ¿Cuál es el número acumulativo de muertes de hijas experimentadas por una mujer promedio que sobrevive hasta los 65 años? Compáralo con el escenario de 2015 creando un marco de datos con las siguientes columnas: `kin`, `loss_1910`, `loss_2015`. ¿Cuál de las dos Focals (una experimentando las tasas de 1910 y la otra las tasas de 2015) ha perdido más hijas a los 65 años? ¿Cuántas hijas más ha perdido?
+**1.4**: ¿Cuál es el número acumulativo de muertes de hijas experimentadas por una mujer promedio que sobrevive hasta los 65 años? Compáralo con el escenario de 2015 creando un data frame con las siguientes columnas: `kin`, `loss_1910`, `loss_2015`. ¿Cuál de las dos Focals (una experimentando las tasas de 1910 y la otra las tasas de 2015) ha perdido más hijas a los 65 años? ¿Cuántas hijas más ha perdido?
 
-```{r, eval= F, include=F}
+```{r, eval= F, include=T}
 # Escribe tu código aquí
-# para todos los familiares en este caso
-swe_1910$kin_summary %>%
-  filter(age_focal == 65, kin == "d") %>%
-  select(age_focal, loss_1910 = count_cum_dead) %>%
-  inner_join(
-    swe_2015$kin_summary %>%
-      filter(age_focal == 65, kin == "d") %>%
-      select(age_focal, loss_2015 = count_cum_dead))
 ```
 
 #### 2. Distribución de edades de los familiares
@@ -720,31 +699,14 @@ Para este ejercicio, crearemos la edad promedio de parientes de Focal 'a mano':
 
 **2.1**: Usando la informacion en `kin_full`, obtiene la edad promedio de la madre, hija y hermanas vivas para una mujer de 35 años.
 
-```{r, eval= F, include=F}
+```{r, eval= F, include=T}
 # Escribe tu código aquí
-mean_ages_2015 <- swe_2015$kin_full %>%
-  filter(age_focal == 35) %>%
-  summarise(mean_age = sum(age_kin*living)/sum(living),
-            .by = c(kin))
-mean_ages_2015
 ```
 
 **2.2**: Haz lo mismo con las tasas de 1910 y compara ambos conjuntos de resultados visualmente.
 
-```{r, eval= F, include=F}
+```{r, eval= F, include=T}
 # Escribe tu código aquí
-mean_ages_1910 <- swe_1910$kin_full %>%
-  filter(age_focal == 35) %>%
-  summarise(mean_age = sum(age_kin*living)/sum(living),
-            .by = c(kin))
-# una posible gráfica
-mean_ages_1910 %>%
-  mutate(year = 1910) %>%
-  bind_rows(
-    mean_ages_2015 %>% mutate(year = 2015)) %>%
-  ggplot() +
-  geom_bar(aes(kin, mean_age, fill=factor(year)),
-           stat = "identity", position = "dodge")
 ```
 
 #### 3. La 'Generación Sándwich' 
@@ -755,16 +717,8 @@ Para este ejercicio, consideramos niveles de 'ensanguchamiento' al observar el n
 
 **Responde**: ¿A qué edad se encuentra Focal más *apretada* (es decir, a qué edad tiene simultáneamente el mayor número de hijas y madres dependientes)? Si graficas el total de 'sándwich' por edad, obtendrás 500 puntos. Por 1,000 puntos, agrega colores a cada tipo de pariente. 
 
-```{r, eval= F, include=F}
-swe_2015$kin_full %>%
-  group_by(age_focal) %>%
-  summarise(daughter = sum(living[kin=='d' & age_kin<=15]),
-            mother = sum(living[kin=='m' & age_kin>=75]),
-            sandwiched_level = daughter + mother) %>%
-  pivot_longer(cols = daughter:sandwiched_level) %>%
-  ggplot()+
-  geom_line(aes(age_focal, value, col=name))+
-  scale_x_continuous(labels = seq(0,100,5), breaks = seq(0,100,5))
+```{r, eval= F, include=T}
+# Escribe tu código aquí
 ```
 
 #### 4. Compare DemoKin con cálculos 'a mano'
@@ -773,19 +727,13 @@ Para este ejercicio, utilizarás los vectores $p$ y $f$ del ejemplo de juguete (
 
 **3.1** Reproduce los resultados para el número esperado de abuelas utilizando `DemoKin`. **Responde**: ¿Obtienes el número esperado de abuelas para Focal utilizando DemoKin como lo hiciste en la sección "A mano" [By hand](#by_hand_mon8)?
 
-```{r, eval= F, include=F}
-ejemplo_a_mano <- kin(p, f, birth_female = 1)
-# algunas verificaciones
-ejemplo_a_mano$kin_summary %>% filter(kin == "gm") %>% pull(count_living) == g
-ejemplo_a_mano$kin_summary %>% filter(kin == "m") %>% pull(count_living) == d
-ejemplo_a_mano$kin_summary %>% filter(kin == "d") %>% pull(count_living) == a
-# abuelas
-ejemplo_a_mano$kin_summary %>% filter(kin == "gm") %>% pull(count_living)
+```{r, eval= F, include=T}
+# Escribe tu código aquí
 ```
 
 ### A mano {#by_hand_mon8}
 
-Imaginemos que estamos estudiando una población femenina con 5 clases de edad y probabilidades de supervivencia y tasas de fertilidad fijas (solo descendencia femenina), dadas por:
+Imaginemos que estamos estudiando una población femenina con 5 clases de edad y probabilidades de supervivencia y tasas de fecundidad fijas (solo descendencia femenina), dadas por:
 
 ```{r}
 age <- 0:4
@@ -955,7 +903,7 @@ library(ggplot2)
 
 #### 1. Parientes vivos
 
-Vimos ayer el caso de Suecia en 2015 asumiendo tasas constantes. Pero como sabes, la demografía de Suecia está cambiando cada año. Esto significa que Focal y sus parientes han experimentado tasas de mortalidad y fertilidad cambiantes a lo largo del tiempo. Los datos que estamos utilizando tienen años en columnas y edades en filas. Aquí, trazamos $q_x$ (el complemento de p) por edad y tiempo:
+Vimos ayer el caso de Suecia en 2015 asumiendo tasas constantes. Pero como sabes, la demografía de Suecia está cambiando cada año. Esto significa que Focal y sus parientes han experimentado tasas de mortalidad y fecundidad cambiantes a lo largo del tiempo. Los datos que estamos utilizando tienen años en columnas y edades en filas. Aquí, trazamos $q_x$ (el complemento de p) por edad y tiempo:
 
 ```{r}
 data("swe_px", package="DemoKin")
@@ -970,7 +918,7 @@ swe_px %>%
     theme(legend.position = "none")
 ```
 
-Tasas específicas de fertilidad por edad:
+Tasas específicas de fecundidad por edad:
 
 ```{r}
 data("swe_asfr", package="DemoKin")
@@ -1022,7 +970,7 @@ swe_time_varying_1960_cohort$kin_summary %>%
   theme_bw()
 ```
 
-Estos son los parientes vivos para una mujer promedio nacida en 1960, dados los datos de fertilidad, mortalidad y distribución de población dependientes del tiempo para el período 1900-2018. Si se incluye la población como entrada, entonces $pi(t)$ se considerará "observada". Observa el argumento `output_cohort = 1960`, que se utiliza para extraer estimaciones para una cohorte determinada de Focales (una diagonal en el diagrama de Lexis). Este es un subconjunto de todos los resultados posibles (101 clases de edad y 119 años). Las estimaciones se detienen a los 58 años porque solo proporcionamos datos de entrada (periodo) hasta el año 2018 (`2018 - 1960 = 58`).
+Estos son los parientes vivos para una mujer promedio nacida en 1960, dados los datos de fecundidad, mortalidad y distribución de población dependientes del tiempo para el período 1900-2018. Si se incluye la población como entrada, entonces $pi(t)$ se considerará "observada". Observa el argumento `output_cohort = 1960`, que se utiliza para extraer estimaciones para una cohorte determinada de Focales (una diagonal en el diagrama de Lexis). Este es un subconjunto de todos los resultados posibles (101 clases de edad y 119 años). Las estimaciones se detienen a los 58 años porque solo proporcionamos datos de entrada (periodo) hasta el año 2018 (`2018 - 1960 = 58`).
 
 Ahora comparemos entre cohortes. Por ejemplo, podemos comparar las cohortes de 1910 y 1960.
 
@@ -1046,7 +994,7 @@ swe_time_varying_1960_1910_cohort$kin_summary %>%
   theme_bw()
 ```
 
-Tómate un momento para interpretar los resultados a continuación (la tabla y el gráfico). **Responde**: ¿Notas alguna tendencia inesperada para algún tipo de parentesco al comparar entre cohortes? ¿Qué podría estar causándola?
+Tómate un momento para interpretar los resultados del gráfico anterior. **Responde**: ¿Notas alguna tendencia inesperada para algún tipo de parentesco al comparar entre cohortes? ¿Qué podría estar causándola?
 
 ```{r, eval=F, include=F}
 plot(1900:2018, colSums(swe_asfr))
@@ -1083,7 +1031,7 @@ swe_time_varying_1960_period$kin_summary %>%
 
 #### DemoKin no admite combinaciones de cohorte y período
 
-> `DemoKin` solo devolverá valores para períodos O cohortes, pero nunca para combinaciones de período-cohorte. Esto está relacionado con problemas de tiempo/memoria. Por ejemplo, proporcionar todas las estimaciones posibles de período-cohorte en nuestro ejemplo resultaría en un marco de datos con 119 X 101 x 101 x 14 ~ 17 millones de filas.
+> `DemoKin` solo devolverá valores para períodos O cohortes, pero nunca para combinaciones de período-cohorte. Esto está relacionado con problemas de tiempo/memoria. Por ejemplo, proporcionar todas las estimaciones posibles de período-cohorte en nuestro ejemplo resultaría en un data frame con 119 X 101 x 101 x 14 ~ 17 millones de filas.
 
 Considera el siguiente código, que dará un error ya que estamos solicitando **ambos** una salida de cohorte y período al mismo tiempo:
 
@@ -1128,7 +1076,7 @@ swe_time_varying_1960_1910_cohort$kin_summary %>%
 ```
 
 **Responde:** Considera a una Focal de 50 años en ambas cohortes: ¿cómo describirías las diferencias en términos de su edad promedio al momento de la pérdida de parientes de diferentes tipos?
-l
+
 
 ### Ejercicios {#exercises_tues9}
 
@@ -1163,7 +1111,7 @@ data <- get_UNWPP_inputs(
   my_endyr = my_endyr)
 
 
-# remodelar fertilidad convenientemente para DemoKin (es decir, crear una matriz con años
+# remodelar fecundidad convenientemente para DemoKin (es decir, crear una matriz con años
 # como columnas y edades como filas)
 country_fert <- data %>%
   select(age, year, fx) %>%
@@ -1176,43 +1124,16 @@ country_fert[20:25,1:5]
 
 #### 1. Parentesco esperado para el país elegido
 
-**1.1** Usando el objeto `data` creado anteriormente, para su propio país, remodelar los datos de fertilidad y supervivencia de la misma manera en que remodelamos los datos de fertilidad anteriormente. Grafique la evolución de la mortalidad a lo largo del tiempo y la edad, o cree una tabla que resuma eso. Puede usar el gráfico de los valores $q_x$ por edad para todos los períodos que hicimos para Suecia como inspiración (usando diferentes colores para cada período).
+**1.1** Usando el objeto `data` creado anteriormente, para su propio país, remodelar los datos de fecundidad y supervivencia de la misma manera en que remodelamos los datos de fecundidad anteriormente. Grafique la evolución de la mortalidad a lo largo del tiempo y la edad, o cree una tabla que resuma eso. Puede usar el gráfico de los valores $q_x$ por edad para todos los períodos que hicimos para Suecia como inspiración (usando diferentes colores para cada período).
 
-```{r, eval= F, include=F}
-# remodelar supervivencia
-country_surv <- data %>%
-  select(age, year, px) %>%
-  pivot_wider(names_from = year, values_from = px) %>%
-  select(-age) %>%
-  as.matrix()
-# gráfico
-country_surv %>%
-    as.data.frame() %>%
-    mutate(age = 1:nrow(swe_asfr)-1) %>%
-    pivot_longer(-age, names_to = "year", values_to = "px") %>%
-    mutate(qx = 1-px) %>%
-    ggplot() +
-    geom_line(aes(x = age, y = qx, col = year)) +
-    scale_y_log10() +
-    theme(legend.position = "none")
+```{r, eval= F, include=T}
+# Escribe tu código aquí
 ```
 
 **1.2** Ejecute un modelo de parentesco variante en el tiempo para su país. Cree resultados solo para dos años: 1950 y 2015 (es decir, aplique una perspectiva de período). Centrándose en un Individuo focal de 50 años, compare ambos años en términos de (a) total de personas vivas y (b) edad media. **Responde:** ¿Qué tipo de parentesco muestra las mayores diferencias entre esos dos años?
 
-```{r, eval= F, include=F}
-E.1.2 <-
-  kin(p = country_surv,
-    f = country_fert,
-    time_invariant =FALSE,
-    output_period = c(1950, 2015),
-    output_kin = c("d","gd","ggd","m","gm","ggm"))
-# tabla
-E.1.2$kin_summary %>%
-  filter(age_focal == 50) %>%
-  summarise(count_living = sum(count_living), .by = c(kin, year)) %>%
-  pivot_wider(names_from = year, values_from = count_living) %>%
-  mutate(dif_abs = `1950`-`2015`, dif_rel = dif_abs/`1950`) %>%
-  arrange(-abs(dif_rel))
+```{r, eval= F, include=T}
+# Escribe tu código aquí
 ```
 
 #### 2. Tiempo de vida compartido con parientes
@@ -1225,18 +1146,8 @@ E.1.2$kin_summary %>%
 
 **Responde:** ¿Cuántos años-persona se compartieron entre el Individuo focal y sus nietos en el período entre el nacimiento del Individuo focal y su 70 cumpleaños? Recuerde que, para este ejercicio, el Individuo focal nació en 1950.
 
-```{r, eval= F, include=F}
-E.1.3 <-
-  kin(p = country_surv,
-    f = country_fert,
-    time_invariant =FALSE,
-    output_cohort = c(1950),
-    output_kin = c("gd")
-    )
-E.1.3$kin_summary %>%
-  mutate(shared_years = cumsum(count_living), .by = c(kin, cohort)) %>%
-  filter(age_focal == 70) %>%
-  summarise(gd_years =sum(shared_years), .by = c(cohort, kin))
+```{r, eval= F, include=T}
+# Escribe tu código aquí
 ```
 
 #### 3. Duelo por Covid
@@ -1244,40 +1155,20 @@ E.1.3$kin_summary %>%
 La pandemia de Covid ha estado relacionada con una ola de pérdidas de parientes en algunos países [@verdery_tracking_2020;@Snyder2022]. Usaremos `DemoKin` para aproximar la magnitud de este 'sobreduelo' (es decir, muertes de parientes que no se habrían experimentado en ausencia de la pandemia). Para esto, procederá en tres pasos:
 
 1. Necesitará un 'escenario base': ¿cómo habría sido la mortalidad en 2020 y 2021 en ausencia de COVID? Cree un escenario contrafáctico 'no covid' asumiendo que los niveles de mortalidad observados en 2019 (es decir, antes de la pandemia) estuvieran en vigor durante el período 2020-2021. (También puede crear líneas de base más sofisticadas si lo desea).
-2. En segundo lugar, ejecute dos modelos de parentesco variantes en el tiempo: uno 'realista' que utiliza las tasas empíricas de mortalidad y fertilidad para el período de 1950:2021. El modelo 'contrapuesto' es equivalente al 'realista' excepto que utiliza las tasas de mortalidad de 2019 para el período de 2020:2021.
+2. En segundo lugar, ejecute dos modelos de parentesco variantes en el tiempo: uno 'realista' que utiliza las tasas empíricas de mortalidad y fecundidad para el período de 1950:2021. El modelo 'contrapuesto' es equivalente al 'realista' excepto que utiliza las tasas de mortalidad de 2019 para el período de 2020:2021.
 3. Estime la diferencia entre el número de parientes vivos para un Individuo focal de 60 años en los escenarios 'realista' y 'contrapuesto' para el año 2021. Una forma intuitiva de pensar en esto:
 
 ![](covid.png)
 
 **Responde:** Proporcione una medida de la magnitud del 'sobreduelo' causado por el COVID-19. Puede elegir una medida absoluta o relativa: depende de usted, pero esté preparado para justificar su elección.
 
-```{r, eval= F, include=F}
-country_surv_counterfactual <- country_surv
-country_surv_counterfactual[,"2020"] <- country_surv_counterfactual[,"2019"]
-country_surv_counterfactual[,"2021"] <- country_surv_counterfactual[,"2019"]
-E.1.4 <-
-  kin(
-    p = country_surv,
-    f = country_fert,
-    time_invariant =FALSE,
-    output_period = c(2021)
-    )
-E.1.4_counterfactual <-
-  kin(
-    p = country_surv_counterfactual,
-    f = country_fert,
-    time_invariant =FALSE,
-    output_period = c(2021)
-    )
-olders_Focal <- E.1.4$kin_full %>% summarise(all_kin = sum(living[age_focal == 60 & age_kin>60]))
-olders_Focal_counterf <- E.1.4_counterfactual$kin_full %>% summarise(all_kin = sum(living[age_focal == 60 & age_kin>60]))
-excess_bereav_indic <- 1-olders_Focal/olders_Focal_counterf
-# en el caso de este país, el Individuo focal tendría un exceso relativo de .3%, en relación a las personas mayores que ella.
+```{r, eval= F, include=T}
+# Escribe tu código aquí
 ```
 
 ### A mano {#by_hand_tues9}
 
-Sigamos estudiando nuestra población cerrada de mujeres con 5 clases de edad, pero ahora sabemos que en los próximos 9 años ($T=9$) la probabilidad de muerte disminuirá un 1% anual para todas las clases de edad. Las tasas de fertilidad también disminuirán un 1% cada año. Utilizaremos `Pt` y `Ft` para crear matrices con tasas variables en el tiempo (el tiempo en las columnas y la edad en las filas).
+Sigamos estudiando nuestra población cerrada de mujeres con 5 clases de edad, pero ahora sabemos que en los próximos 9 años ($T=9$) la probabilidad de muerte disminuirá un 1% anual para todas las clases de edad. Las tasas de fecundidad también disminuirán un 1% cada año. Utilizaremos `Pt` y `Ft` para crear matrices con tasas variables en el tiempo (el tiempo en las columnas y la edad en las filas).
 
 ```{r}
 age <- 0:4
@@ -1294,7 +1185,7 @@ lines(age, Pt[,T.+1], col=2, t="b")
 legend("topright", c("0","T"), col = 1:2, lty=1)
 ```
 
-Estas matrices no son convenientes para fines de proyección: para esto necesitaríamos matrices de transición. Creemos dos listas con matrices dependientes del tiempo para la supervivencia y la fertilidad, llamadas `Ut_list` y `Ft_list`. Volveremos a ellas pronto.
+Estas matrices no son convenientes para fines de proyección: para esto necesitaríamos matrices de transición. Creemos dos listas con matrices dependientes del tiempo para la supervivencia y la fecundidad, llamadas `Ut_list` y `Ft_list`. Volveremos a ellas pronto.
 
 ```{r}
 Ut_list <- list() # eq 6 Caswell (2021)
@@ -1417,7 +1308,7 @@ D_table <-lapply(1:length(Dt_list), function(t){
 head(D_table)
 ```
 
-Tenemos una tabla con 250 filas (5 clases de edad del Focal por 10 años por 5 clases de edad de la madre), con madres vivas por edad para cada edad del Focal, en cada año, en función de la edad del pariente. Esto permite el análisis en las dimensiones de Edad-Periodo-Cohorte (EPC) (sección 2.2 en @caswell_formal_2021). Esto es bastante similar a lo que nos proporciona `Demokin` como resultado en el marco de datos `kin_full`. Un razonamiento similar se aplica a otros tipos de parientes. El límite de tiempo proviene de la suposición invariante en el tiempo, y el límite de edad proviene de usar $\pi(t)$ en cada año. Por ejemplo, las abuelas para un recién nacido en $t=3$ serán `Dt_list[[3]] %*% Pi[,3]`, lo cual en términos de la tabla 1 de @caswell_formal_2021 es $\sum_{i}{\pi_i(t)d(i,t)}$, una forma vectorizada con edades $i$.
+Tenemos una tabla con 250 filas (5 clases de edad del Focal por 10 años por 5 clases de edad de la madre), con madres vivas por edad para cada edad del Focal, en cada año, en función de la edad del pariente. Esto permite el análisis en las dimensiones de Edad-Periodo-Cohorte (EPC) (sección 2.2 en @caswell_formal_2021). Esto es bastante similar a lo que nos proporciona `Demokin` como resultado en el data frame `kin_full`. Un razonamiento similar se aplica a otros tipos de parientes. El límite de tiempo proviene de la suposición invariante en el tiempo, y el límite de edad proviene de usar $\pi(t)$ en cada año. Por ejemplo, las abuelas para un recién nacido en $t=3$ serán `Dt_list[[3]] %*% Pi[,3]`, lo cual en términos de la tabla 1 de @caswell_formal_2021 es $\sum_{i}{\pi_i(t)d(i,t)}$, una forma vectorizada con edades $i$.
 
 #### Ejercicio. Comparar DemoKin con cálculos "a mano"
 
@@ -1450,7 +1341,7 @@ Durante esta sección, utilizaremos `DemoKin` para modelos de parentesco de dos 
 
 ### Usando DemoKin {#usando_demokin_mier10}
 
-En general, los hombres viven menos y se reproducen más tarde que las mujeres. Estos procesos específicos de cada sexo afectan la dinámica del parentesco de varias maneras. Por ejemplo, el grado en que un miembro promedio de la población, llamémosla Focal, tiene un abuelo vivo se ve afectado por la mortalidad diferencial que afecta a la generación parental en edades avanzadas. También podemos estar interesados en considerar cómo varían las estructuras de parentesco según el sexo de Focal: un hombre puede tener un número diferente de nietos que una mujer debido a las diferencias en la fertilidad por sexo. Documentar estas diferencias es importante ya que las mujeres a menudo enfrentan mayores expectativas de brindar apoyo y cuidado informal a sus familiares. A medida que viven más tiempo, pueden encontrarse en mayor riesgo de no tener parientes vivos. La función `kin2sex` implementa modelos de parentesco de dos sexos según lo introducido por Caswell (2022). Esta guía muestra cómo ejecutar modelos de dos sexos y destaca algunas de las ventajas de este modelo sobre los modelos de un solo sexo en poblaciones con tasas invariantes en el tiempo y tasas variantes en el tiempo.
+En general, los hombres viven menos y se reproducen más tarde que las mujeres. Estos procesos específicos de cada sexo afectan la dinámica del parentesco de varias maneras. Por ejemplo, el grado en que un miembro promedio de la población, llamémosla Focal, tiene un abuelo vivo se ve afectado por la mortalidad diferencial que afecta a la generación parental en edades avanzadas. También podemos estar interesados en considerar cómo varían las estructuras de parentesco según el sexo de Focal: un hombre puede tener un número diferente de nietos que una mujer debido a las diferencias en la fecundidad por sexo. Documentar estas diferencias es importante ya que las mujeres a menudo enfrentan mayores expectativas de brindar apoyo y cuidado informal a sus familiares. A medida que viven más tiempo, pueden encontrarse en mayor riesgo de no tener parientes vivos. La función `kin2sex` implementa modelos de parentesco de dos sexos según lo introducido por Caswell (2022). Esta guía muestra cómo ejecutar modelos de dos sexos y destaca algunas de las ventajas de este modelo sobre los modelos de un solo sexo en poblaciones con tasas invariantes en el tiempo y tasas variantes en el tiempo.
 
 ```{r, message=FALSE, warning=FALSE}
 library(DemoKin)
@@ -1462,7 +1353,7 @@ library(knitr)
 
 #### 1. Tasas demográficas por sexo
 
-Los datos sobre la fertilidad masculina por edad son menos comunes que los de la fertilidad femenina. @schoumaker2019 muestra que la Tasa Fertilidad (TFR) masculina casi siempre es mayor que la TFR femenina utilizando una muestra de 160 países, y esta brecha disminuye con la transición de la fertilidad. Para este ejemplo, utilizamos datos de Francia en 2012 (de @caswell_formal_2022) para ejemplificar el uso de la función de dos sexos en `DemoKin`. Los datos sobre la fertilidad y mortalidad femenina y masculina están incluidos en el paquete.
+Los datos sobre la fecundidad masculina por edad son menos comunes que los de la fecundidad femenina. @schoumaker2019 muestra que la Tasa Global de Fecundidad (TFR) masculina casi siempre es mayor que la TFR femenina utilizando una muestra de 160 países, y esta brecha disminuye con la transición de la fecundidad. Para este ejemplo, utilizamos datos de Francia en 2012 (de @caswell_formal_2022) para ejemplificar el uso de la función de dos sexos en `DemoKin`. Los datos sobre la fecundidad y mortalidad femenina y masculina están incluidos en el paquete.
 
 ```{r}
 age <- 0:100
@@ -1476,20 +1367,20 @@ fra_surv_m <- fra_surv_sex[,"pm"]
 data.frame(value = c(fra_fert_f, fra_fert_m, fra_surv_f, fra_surv_m),
            age = rep(age, 4),
            sex = rep(c(rep("f", ages), rep("m", ages)), 2),
-           risk = c(rep("tasa de fertilidad", ages * 2), rep("probabilidad de supervivencia", ages * 2))) %>%
+           risk = c(rep("tasa de fecundidad", ages * 2), rep("probabilidad de supervivencia", ages * 2))) %>%
   ggplot(aes(age, value, col=sex)) +
   geom_line() +
   facet_wrap(~ risk, scales = "free_y") +
   theme_bw()
 ```
 
-En esta población, la TFR masculina y femenina parece casi idéntica, pero las distribuciones de la fertilidad por sexo varían según la edad. 
+En esta población, la TFR masculina y femenina parece casi idéntica, pero las distribuciones de la fecundidad por sexo varían según la edad. 
 
 Para puntos extra: ¿Puede calcular la TFR y la edad media al momento del nacimiento para cada sexo?
 
 #### 2. Modelos de parentesco de dos sexos invariantes en el tiempo
 
-Ahora presentamos las funciones `kin2sex`, que es similar a la función de un solo sexo `kin` (consultar `?kin2sex`) con dos excepciones. En primer lugar, el usuario debe especificar la mortalidad y la fertilidad por sexo. En segundo lugar, se debe indicar el sexo de Focal (que se asume que es femenino de forma predeterminada, al igual que en el modelo de un solo sexo). Primero, consideremos la aplicación para poblaciones invariantes en el tiempo:
+Ahora presentamos las funciones `kin2sex`, que es similar a la función de un solo sexo `kin` (consultar `?kin2sex`) con dos excepciones. En primer lugar, el usuario debe especificar la mortalidad y la fecundidad por sexo. En segundo lugar, se debe indicar el sexo de Focal (que se asume que es femenino de forma predeterminada, al igual que en el modelo de un solo sexo). Primero, consideremos la aplicación para poblaciones invariantes en el tiempo:
 
 ```{r}
 fra_kin_2sex <- kin2sex(
@@ -1562,7 +1453,7 @@ kin_out %>%
 
 Ahora, nos enfocaremos en poblaciones donde las tasas demográficas no son estáticas, sino que cambian anualmente.
 Para esto, extendemos el período utilizando los datos ubicados en *"data/fra_2sex.Rdata"*, que puedes cargar con la función `load` como hicimos en los días anteriores. Estos son datos de Naciones Unidas, por lo que se puede realizar otro ejercicio con HMD y HFD retrocediendo en el tiempo.
-Para este ejemplo, "pretendemos" que las tasas de fertilidad masculina son iguales a las de fertilidad, pero ligeramente más altas. En realidad, hay algunos datos para el período 1998-2013 en [HFD](https://www.fertilitydata.org/Data/DataAvailability), pero por ahora lo mantendremos simple (para este ejercicio, también extrapolaremos el nivel y el patrón hacia atrás).
+Para este ejemplo, "pretendemos" que las tasas de fecundidad masculina son iguales a las de fecundidad, pero ligeramente más altas. En realidad, hay algunos datos para el período 1998-2013 en [HFD](https://www.fertilitydata.org/Data/DataAvailability), pero por ahora lo mantendremos simple (para este ejercicio, también extrapolaremos el nivel y el patrón hacia atrás).
 
 ```{r}
 load("../data/fra_2sex.Rdata")
@@ -1574,7 +1465,7 @@ mac_females_2012 <- sum(0:100 * fra_fert_f)/sum(fra_fert_f)
 mac_males_2012   <- sum(0:100 * fra_fert_m)/sum(fra_fert_m)
 dif_mac_2012     <- trunc(mac_males_2012 - mac_females_2012)
 
-# crear una matriz de fertilidad masculina
+# crear una matriz de fecundidad masculina
 fra_asfr_males <- matrix(0, ages, years)
 colnames(fra_asfr_males) <- colnames(fra_asfr_females)
 fra_asfr_males[(dif_mac_2012+1):ages,] <- fra_asfr_females[1:(ages-dif_mac_2012),]
@@ -1631,101 +1522,22 @@ kin_out_time_variant$kin_summary %>%
 
 #### Parientes vivos por sexo
 
-**E1** Descarga los datos de tu país desde [DataPortal API](https://population.un.org/dataportal/about/dataapi) de la División de Población de las Naciones Unidas. Pero esta vez también utiliza el parámetro `sex = "Male"` porque necesitarás patrones de supervivencia específicos por edad y tiempo para hombres (este parámetro está configurado de forma predeterminada como `sex = "Female"`). No olvides remodelar los datos al formato de matriz como hicimos ayer. Asume para este ejercicio el mismo patrón de fertilidad para hombres que para mujeres y responde:
+**E1** Descarga los datos de tu país desde [DataPortal API](https://population.un.org/dataportal/about/dataapi) de la División de Población de las Naciones Unidas. Pero esta vez también utiliza el parámetro `sex = "Male"` porque necesitarás patrones de supervivencia específicos por edad y tiempo para hombres (este parámetro está configurado de forma predeterminada como `sex = "Female"`). No olvides remodelar los datos al formato de matriz como hicimos ayer. Asume para este ejercicio el mismo patrón de fecundidad para hombres que para mujeres y responde:
 
-```{r, include=FALSE, eval=FALSE}
-# cargar la función
-source("get_UNWPP_inputs.R")
-
-# seleccionar país
-country <- c("Mexico")
-
-# Rango de años
-my_startyr   <- 1950
-my_endyr     <- 2022
-
-# descargar
-data_females <- get_UNWPP_inputs(
-  countries = country,sex = "Female",
-  my_startyr = my_startyr,
-  my_endyr = my_endyr)
-data_males <- get_UNWPP_inputs(
-  countries = country,sex = "Male",
-  my_startyr = my_startyr,
-  my_endyr = my_endyr)
-
-# remodelar
-arg_asfr_females <- data_females %>%
-  select(age, year, fx) %>%
-  pivot_wider(names_from = year, values_from = fx) %>%
-  select(-age) %>%
-  as.matrix()
-arg_surv_females <- data_females %>%
-  select(age, year, px) %>%
-  pivot_wider(names_from = year, values_from = px) %>%
-  select(-age) %>%
-  as.matrix()
-arg_surv_males <- data_males %>%
-  select(age, year, px) %>%
-  pivot_wider(names_from = year, values_from = px) %>%
-  select(-age) %>%
-  as.matrix()
+```{r, eval= F, include=T}
+# Escribe tu código aquí
 ```
 
 **E1.1** En un modelo invariante en el tiempo: ¿cuántas abuelas y abuelos vivos puede esperar tener una mujer a los 15 años en 1950 y en 2015, y cuál es su edad media? Extrae una conclusión basada en los resultados.
 
-```{r, include=FALSE, eval=FALSE}
-kin_out_1950 <- kin2sex(
-                      pf = arg_surv_females[,"1950"],
-                      pm = arg_surv_males[,"1950"],
-                      ff = arg_asfr_females[,"1950"],
-                      fm = arg_asfr_females[,"1950"],
-                      time_invariant = TRUE,
-                      sex_focal = "f", birth_female = .5)
-kin_out_2015 <- kin2sex(
-                      pf = arg_surv_females[,"2015"],
-                      pm = arg_surv_males[,"2015"],
-                      ff = arg_asfr_females[,"2015"],
-                      fm = arg_asfr_females[,"2015"],
-                      time_invariant = TRUE,
-                      sex_focal = "f", birth_female = .5)
-bind_rows(
-  kin_out_1950$kin_summary %>%
-    filter(age_focal==15, kin == "gm") %>%
-    select(sex_kin, count_living, mean_age) %>%
-    mutate(year = 1950),
-  kin_out_2015$kin_summary %>%
-    filter(age_focal==15, kin == "gm") %>%
-    select(sex_kin, count_living, mean_age) %>%
-    mutate(year = 2015)
-  )
+```{r, eval= F, include=T}
+# Escribe tu código aquí
 ```
+
 **E1.2** Compara las 'proporciones sexuales' (sex ratios) de los abuelos, padres, hijas e hermanos en un marco temporal variable para la cohorte 1950, en cada edad de la Focal (p. Ej., la proporcion de abuelos a abuelas).
 
-```{r, include=FALSE, eval=FALSE}
-kin_out_2015 <- kin2sex(
-                      pf = arg_surv_females,
-                      pm = arg_surv_males,
-                      ff = arg_asfr_females,
-                      fm = arg_asfr_females,
-                      time_invariant = FALSE,
-                      output_cohort = 1950, 
-                      output_kin = c("gm", "m", "d", "os", "ys"),
-                      sex_focal = "f", birth_female = .5)
-kin_out_2015$kin_summary %>%
-  mutate(kin = case_when(kin == "d" ~ "hijos",
-                         kin == "m" ~ "padres",
-                         kin == "gm" ~ "abuelos",
-                         kin == "os" ~ "hermanos",
-                         kin == "ys" ~ "hermanos",
-                         T ~ "error?")) %>% 
-  summarise(count_living = sum(count_living), .by = c(age_focal, kin, sex_kin)) %>% 
-  select(age_focal, kin, sex_kin, count_living) %>% 
-  pivot_wider(names_from = sex_kin, values_from = count_living) %>% 
-  mutate(sex_ratio = m/f) %>% 
-  ggplot(aes(x = age_focal, y = sex_ratio, color = kin)) +
-  geom_line() +
-  theme_bw() 
+```{r, eval= F, include=T}
+# Escribe tu código aquí
 ```
 
 #### Estructuras de parentesco modeladas y observadas
@@ -1757,8 +1569,8 @@ Ten en cuenta que la figura incluye parientes femeninos y masculinos, y que no s
 Para este ejercicio, debes utilizar `DemoKin` para replicar esta figura. Concretamente, ejecuta tres iteraciones del modelo de parentesco:
 
    1. Modelo de un solo sexo; tasas invariables en el tiempo; factores GKP.
-   2. Modelo de dos sexos; tasas variables en el tiempo; aproximación del parentesco masculino utilizando la suposición andrógina (es decir, la fertilidad masculina es equivalente a la fertilidad femenina); utiliza tasas de mortalidad para hombres y mujeres.
-   3. Modelo de dos sexos; tasas variables en el tiempo; utiliza tasas reales de fertilidad masculina y femenina.
+   2. Modelo de dos sexos; tasas variables en el tiempo; aproximación del parentesco masculino utilizando la suposición andrógina (es decir, la fecundidad masculina es equivalente a la fecundidad femenina); utiliza tasas de mortalidad para hombres y mujeres.
+   3. Modelo de dos sexos; tasas variables en el tiempo; utiliza tasas reales de fecundidad masculina y femenina.
 
 Aquí tienes un resumen de las especificaciones del modelo:
 
@@ -1767,13 +1579,13 @@ data.frame(
 `ID` = 1:3
   , `Tiempo` = c("invariante", "variante", "variante")
   , `Sexo` = c("un solo sexo", "dos sexos", "dos sexos")
-  , `Aprox.` = c("GKP", "Fertilidad andrógina", "Ninguna")
+  , `Aprox.` = c("GKP", "fecundidad andrógina", "Ninguna")
 ) %>% knitr::kable(format = "simple")
 ```
 
-Los datos de mortalidad y fertilidad femenina ya están incluidos en `DemoKin`. Para los hombres, puedes acceder a un archivo llamado "swe_males.Rdata" en la carpeta de datos, con probabilidades de supervivencia y tasas de fertilidad específicas por edad. Estos son **todos los datos que necesitas**. ¿De dónde provienen estos datos? Consulta:
+Los datos de mortalidad y fecundidad femenina ya están incluidos en `DemoKin`. Para los hombres, puedes acceder a un archivo llamado "swe_males.Rdata" en la carpeta de datos, con probabilidades de supervivencia y tasas de fecundidad específicas por edad. Estos son **todos los datos que necesitas**. ¿De dónde provienen estos datos? Consulta:
 
-  - La fertilidad masculina se descargó del sitio [Human Fertility Collection](https://www.fertilitydata.org/Home/Index), utilizando el siguiente comando en R `read.table("https://www.fertilitydata.org/File/GetFile/Country/males/SWE/m_SWE_ASFRstand_TOT.txt", sep = ",", header = T)`. El rango de años es 1751-2020.
+  - La fecundidad masculina se descargó del sitio [Human Fertility Collection](https://www.fertilitydata.org/Home/Index), utilizando el siguiente comando en R `read.table("https://www.fertilitydata.org/File/GetFile/Country/males/SWE/m_SWE_ASFRstand_TOT.txt", sep = ",", header = T)`. El rango de años es 1751-2020.
 
   - La supervivencia masculina se descargó de HMD utilizando el paquete `HMDHFDplus`, echa un vistazo [aquí](https://cran.r-project.org/web/packages/HMDHFDplus/HMDHFDplus.pdf). El rango de años es 1968-2015.
 
@@ -1804,7 +1616,7 @@ Después de ejecutar los 3 modelos, responde:
 
 ### A mano {#by_hand_wed10}
 
-Ahora nuestra población de prueba tiene dos sexos, cada uno tiene su propio patrón de mortalidad y fertilidad por edad, dado por:
+Ahora nuestra población de prueba tiene dos sexos, cada uno tiene su propio patrón de mortalidad y fecundidad por edad, dado por:
 
 ```{r}
 age <- 0:4
@@ -1819,7 +1631,7 @@ lines(age, f_female, t="b", col = 2)
 legend("topright", c("males","females"), col=c(4,2), lty = 1)
 ```
 
-Construyamos las matrices de supervivencia y fertilidad $U$ y $F$ para cada sexo.
+Construyamos las matrices de supervivencia y fecundidad $U$ y $F$ para cada sexo.
 
 ```{r}
 ages <- length(age)
@@ -1847,7 +1659,7 @@ Fb <- rbind(cbind(alpha * F_female,      alpha * F_male), # Fb in eq 9 Caswell (
 Ab <- Ub + Fb
 ```
 
-> Estamos en un escenario en el que la supervivencia y la fertilidad no dependen de la línea de descendencia (es lo mismo para un nieto que proviene de hijas que de hijos). Lo mismo ocurre con las abuelas: no llevaremos un registro de si es la mamá del padre o la mamá de la madre. Esto se hace para simplificar el cálculo de matrices. Puedes cambiarlo según tu enfoque.
+> Estamos en un escenario en el que la supervivencia y la fecundidad no dependen de la línea de descendencia (es lo mismo para un nieto que proviene de hijas que de hijos). Lo mismo ocurre con las abuelas: no llevaremos un registro de si es la mamá del padre o la mamá de la madre. Esto se hace para simplificar el cálculo de matrices. Puedes cambiarlo según tu enfoque.
 
 Proyectemos una población ficticia para ver cómo funcionan las matrices y vectores estructurados por bloques:
 
@@ -1864,7 +1676,7 @@ pop_proj <- Ab %*% popb # sigue siendo un grafo cíclico conectado
 pop_proj
 ```
 
-Las posiciones 1 y 6 en el vector `pop_proj` corresponden a nuevos descendientes, y son iguales porque no importa cuántos individuos nuevos provengan de la fertilidad masculina y cuántos de la fertilidad femenina, todos se dividen por `$\alpha$`.
+Las posiciones 1 y 6 en el vector `pop_proj` corresponden a nuevos descendientes, y son iguales porque no importa cuántos individuos nuevos provengan de la fecundidad masculina y cuántos de la fecundidad femenina, todos se dividen por `$\alpha$`.
 
 Así es como se proyecta una población de 2 sexos. Ahora encontremos la distribución estable por edad $w$, y luego las de los padres $pi$, para cada sexo:
 
@@ -1947,7 +1759,7 @@ lines(age, a_son, t = "b", col = 4)
 legend("topleft", c("hija","hijo"), col = c(2, 4), lty = 1)
 ```
 
-Continuar con otros parientes sigue la misma lógica que el modelo de un solo sexo, pero con vectores y matrices estructurados por bloques, excepto dos excepciones. Para el caso de los descendientes, necesitamos asignar los nacimientos a uno de los padres, porque si no estaríamos contando dos veces a los hermanos jóvenes, por ejemplo (las tasas de fertilidad son independientes entre los sexos). Por convención, se asigna a la madre, reemplazando la fertilidad masculina de $\tilde{F}$ por $\tilde{F}^*$ (eq 57). La otra excepción es que para los ancestros, $\pi$ es la suma de la distribución femenina y masculina, debido a la falta de identificación de los abuelos por sexo de los que proviene la línea parental. Consulta la tabla de @caswell_formal_2022 para un resumen.
+Continuar con otros parientes sigue la misma lógica que el modelo de un solo sexo, pero con vectores y matrices estructurados por bloques, excepto dos excepciones. Para el caso de los descendientes, necesitamos asignar los nacimientos a uno de los padres, porque si no estaríamos contando dos veces a los hermanos jóvenes, por ejemplo (las tasas de fecundidad son independientes entre los sexos). Por convención, se asigna a la madre, reemplazando la fecundidad masculina de $\tilde{F}$ por $\tilde{F}^*$ (eq 57). La otra excepción es que para los ancestros, $\pi$ es la suma de la distribución femenina y masculina, debido a la falta de identificación de los abuelos por sexo de los que proviene la línea parental. Consulta la tabla de @caswell_formal_2022 para un resumen.
 
 #### Ejercicio
 
@@ -1975,7 +1787,7 @@ Durante esta sección veremos cómo aplicar los **modelos de parentesco de un so
 
 ### Usando DemoKin {#by_hand_thurs11}
 
-`DemoKin` permite el cálculo de estructuras de parentesco en un usdando models 'multiestado' ('multistate'), clasificando a los individuos según su edad y alguna otra característica (por ejemplo, etapas de una enfermedad). Para ello, necesitamos datos de mortalidad y fertilidad para cada etapa posible y probabilidades de transición entre etapas según la edad.
+`DemoKin` permite el cálculo de estructuras de parentesco en un usdando models 'multiestado' ('multistate'), clasificando a los individuos según su edad y alguna otra característica (por ejemplo, etapas de una enfermedad). Para ello, necesitamos datos de mortalidad y fecundidad para cada etapa posible y probabilidades de transición entre etapas según la edad.
 
 ```{r, message=FALSE, warning=FALSE}
 library(DemoKin)
@@ -2127,7 +1939,7 @@ Ahora, con su país, realice los mismos pasos y luego **responda**:
 
 ### A mano {#by_hand_fr11}
 
-Continuamos estudiando la misma población femenina, pero ahora tenemos acceso a su nivel educativo y su fertilidad y mortalidad diferencial. Esta población tiene 2 etapas en la educación ($s=2$): baja y alta.
+Continuamos estudiando la misma población femenina, pero ahora tenemos acceso a su nivel educativo y su fecundidad y mortalidad diferencial. Esta población tiene 2 etapas en la educación ($s=2$): baja y alta.
 
 ```{r}
 age <- 0:4
@@ -2163,7 +1975,7 @@ D_low[row(D_low)-1 == col(D_low)] <- p_low[-ages]
 D_high[row(D_high)-1 == col(D_high)] <- p_high[-ages]
 D <- list(D_low, D_high)
 
-# fertilidad de las hijas en cada edad. Todo recién nacido tiene educación baja, sin importar el estado de Focal
+# fecundidad de las hijas en cada edad. Todo recién nacido tiene educación baja, sin importar el estado de Focal
 F. <- lapply(1:ages, function(x){
   matrix(c(f_low[x],0,f_high[x],0),2, 2)
   })
@@ -2254,7 +2066,7 @@ D_stage = kronecker(t(ones_ages), I_s) %*% D
 A_stage; D_stage
 ```
 
-### Ejercicio
+### Ejercicio 'a mano'
 
 Replica los resultados anteriores utilizando la función `kin_multi_stage.R`. Esto se puede obtener de [aquí](https://github.com/alburezg/taller_parentesco_COLMEX_2023/tree/master/docs). Para los argumentos `U`, `f`, `H` y `D` de la función, usa los objetos que creaste anteriormente (esto funciona porque la función puede manejar listas como las que creamos):
 
@@ -2268,7 +2080,7 @@ f <- F. <- lapply(1:ages, function(x){
   })
 ```
 
-Debes establecer `birth_female = 1` porque la fertilidad ya se refiere a las hijas. Dado que el análisis no es de distribución de paridad, establece `parity = FALSE`.
+Debes establecer `birth_female = 1` porque la fecundidad ya se refiere a las hijas. Dado que el análisis no es de distribución de paridad, establece `parity = FALSE`.
 
 <details><summary>Mostrar</summary>
 ```{r}
@@ -2603,7 +2415,7 @@ kin_out_2015$kin_summary %>%
 ```{r}
 load("../data/swe_males.Rdata")
 
-# crear matrices con el mismo rango que los datos de fertilidad masculina
+# crear matrices con el mismo rango que los datos de fecundidad masculina
 asfr_males <- swe_asfr_males
 surv_males <- swe_surv_males[,colnames(swe_asfr_males)]
 asfr_females <- swe_asfr[,colnames(swe_asfr_males)]
