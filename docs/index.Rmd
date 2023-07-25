@@ -1129,6 +1129,7 @@ swe_time_varying_1960_1910_cohort$kin_summary %>%
 
 **Responde:** Considera a una Focal de 50 años en ambas cohortes: ¿cómo describirías las diferencias en términos de su edad promedio al momento de la pérdida de parientes de diferentes tipos?
 l
+
 ### Ejercicios {#exercises_tues9}
 
 Gracias a la API DataPortal de las Naciones Unidas, podemos descargar tasas estimadas de cualquier país del mundo, producidas por el proyecto Perspectivas de la Población Mundial de las Naciones Unidas. Elija cualquier país (siéntase libre de elegir al azar o elegir aquel que le interese) y descargue los datos con la función `get_UNWPP_inputs` (ubicada [aquí](https://github.com/alburezg/taller_parentesco_COLMEX_2023/tree/master/docs)).
