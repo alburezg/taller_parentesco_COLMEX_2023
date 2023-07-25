@@ -703,13 +703,12 @@ swe_1910$kin_summary %>%
 
 Volviendo a Suecia 2015. La salida de `DemoKin::kin` incluye información sobre la edad promedio de los familiares de Focal (en las columnas `kin_summary$mean_age` y `kin_summary$sd_age`). Por ejemplo, esto nos permite determinar la edad promedio, la desviación estándar y el coeficiente de variación de las hermanas de Focal a lo largo de su vida:
 
-```{r, eval= F, include=F, warning=F, message=F}
+```{r, eval= T, include=T, warning=F, message=F}
 swe_2015$kin_summary %>%
   filter(kin %in% c("os", "ys")) %>%
   rename_kin() %>%
   select(kin, age_focal, mean_age, sd_age) %>%
-  mutate(`sd_age/mean_age` = sd_age/mean_age) %>%
-  pivot_longer(mean_age:`sd_age/mean_age`) %>%
+  pivot_longer(mean_age:sd_age) %>%
   ggplot(aes(x = age_focal, y = value, colour = kin)) +
   geom_line() +
   facet_wrap(~name, scales = "free") +
@@ -717,9 +716,9 @@ swe_2015$kin_summary %>%
   theme_bw()
 ```
 
-Usando solo la salida en bruto en `kin_full`:
+Para este ejercicio, crearemos la edad promedio de parientes de Focal 'a mano':
 
-**2.1**: Obtiene la edad promedio de la madre, hija y hermanas vivas para una mujer de 35 años.
+**2.1**: Usando la informacion en `kin_full`, obtiene la edad promedio de la madre, hija y hermanas vivas para una mujer de 35 años.
 
 ```{r, eval= F, include=F}
 # Escribe tu código aquí
@@ -748,9 +747,12 @@ mean_ages_1910 %>%
            stat = "identity", position = "dodge")
 ```
 
-**2.3**: La 'Generación Sándwich' se refiere a las personas que están atrapadas entre padres mayores frágiles e hijos jóvenes dependientes, y se asume que tienen responsabilidades simultáneas de cuidado para múltiples generaciones, lo que potencialmente limita su capacidad para proporcionar cuidado [@alburezgutierrez_sandwich_2021].
+#### 3. La 'Generación Sándwich' 
 
-Para este ejercicio, consideramos niveles de 'sándwich' al observar el número de hijas 'dependientes' vivas (de 15 años o menos) y madres 'dependientes' vivas (de 75 años o más) a lo largo de la vida de Focal. Utiliza `DemoKin` asumiendo tasas invariantes en el tiempo a los niveles de 2015 en Suecia y una población exclusivamente femenina.
+La 'Generación Sándwich' se refiere a las personas que están atrapadas entre padres mayores frágiles e hijos jóvenes dependientes, y se asume que tienen responsabilidades simultáneas de cuidado para múltiples generaciones, lo que potencialmente limita su capacidad para proporcionar cuidado [@alburezgutierrez_sandwich_2021].
+
+Para este ejercicio, consideramos niveles de 'ensanguchamiento' al observar el número de hijas 'dependientes' vivas (de 15 años o menos) y madres 'dependientes' vivas (de 75 años o más) a lo largo de la vida de Focal. Utiliza `DemoKin` asumiendo tasas invariantes en el tiempo a los niveles de 2015 en Suecia y una población exclusivamente femenina.
+
 **Responde**: ¿A qué edad se encuentra Focal más *apretada* (es decir, a qué edad tiene simultáneamente el mayor número de hijas y madres dependientes)? Si graficas el total de 'sándwich' por edad, obtendrás 500 puntos. Por 1,000 puntos, agrega colores a cada tipo de pariente. 
 
 ```{r, eval= F, include=F}
@@ -765,7 +767,7 @@ swe_2015$kin_full %>%
   scale_x_continuous(labels = seq(0,100,5), breaks = seq(0,100,5))
 ```
 
-#### 3. Compare DemoKin con cálculos 'a mano'
+#### 4. Compare DemoKin con cálculos 'a mano'
 
 Para este ejercicio, utilizarás los vectores $p$ y $f$ del ejemplo de juguete (presentado en la sección "A mano" [By hand](#by_hand_mon8)) como entrada para la función `DemoKin::kin`.
 
@@ -1126,7 +1128,7 @@ swe_time_varying_1960_1910_cohort$kin_summary %>%
 ```
 
 **Responde:** Considera a una Focal de 50 años en ambas cohortes: ¿cómo describirías las diferencias en términos de su edad promedio al momento de la pérdida de parientes de diferentes tipos?
-
+l
 ### Ejercicios {#exercises_tues9}
 
 Gracias a la API DataPortal de las Naciones Unidas, podemos descargar tasas estimadas de cualquier país del mundo, producidas por el proyecto Perspectivas de la Población Mundial de las Naciones Unidas. Elija cualquier país (siéntase libre de elegir al azar o elegir aquel que le interese) y descargue los datos con la función `get_UNWPP_inputs` (ubicada [aquí](https://github.com/alburezg/taller_parentesco_COLMEX_2023/tree/master/docs)).
