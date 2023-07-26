@@ -1130,7 +1130,9 @@ country_fert[20:25,1:5]
 # Escribe tu código aquí
 ```
 
-**1.2** Ejecute un modelo de parentesco variante en el tiempo para su país. Cree resultados solo para dos años: 1950 y 2015 (es decir, aplique una perspectiva de período). Centrándose en un Individuo focal de 50 años, compare ambos años en términos de (a) total de personas vivas y (b) edad media. **Responde:** ¿Qué tipo de parentesco muestra las mayores diferencias entre esos dos años?
+**1.2** Ejecute un modelo de parentesco variante en el tiempo para su país. Cree resultados solo para dos años: 1950 y 2015 (es decir, aplique una perspectiva de período). Centrándose en un Individuo focal de 50 años, compare ambos años en términos de (a) total de personas vivas y (b) edad media. En esta ocasión, no usaremos el parámetro `n` (la distribución de la población) dentro de la función `kin`. De acuerdo a la documentación de esta función (`?kin`), el parámetro `n` es opcional. Si no está disponible, `DemoKin` lo inferirá a partir de las tasas de fecundidad y probabilidades de suprevivencia dadas. 
+
+**Responde:** ¿Qué tipo de parentesco muestra las mayores diferencias entre esos dos años?
 
 ```{r, eval= F, include=T}
 # Escribe tu código aquí
@@ -1787,7 +1789,7 @@ Durante esta sección veremos cómo aplicar los **modelos de parentesco de un so
 
 ### Usando DemoKin {#by_hand_thurs11}
 
-`DemoKin` permite el cálculo de estructuras de parentesco en un usdando models 'multiestado' ('multistate'), clasificando a los individuos según su edad y alguna otra característica (por ejemplo, etapas de una enfermedad). Para ello, necesitamos datos de mortalidad y fecundidad para cada etapa posible y probabilidades de transición entre etapas según la edad.
+`DemoKin` permite el cálculo de estructuras de parentesco en un usando models 'multiestado' ('multistate'), clasificando a los individuos según su edad y alguna otra característica (por ejemplo, etapas de una enfermedad). Para ello, necesitamos datos de mortalidad y fecundidad para cada etapa posible y probabilidades de transición entre etapas según la edad.
 
 ```{r, message=FALSE, warning=FALSE}
 library(DemoKin)
@@ -1798,14 +1800,14 @@ library(knitr)
 ```
 
 Consideremos el ejemplo de Eslovaquia dado por @caswell_formal_2020, donde las etapas son estados de paridad.
-`DemoKin` incluye los datos para replicar este análisis para el año 1990. Tenga en cuenta que la función permite que el usuario ingrese listas para cada argumento (debe ser consistente en dimensiones), como se muestra en el artículo y más adelante en este material, o en un formato de data.frame para algunos argumentos. Los datos que vienen con el paquete están en este formato (eche un vistazo en R):
+`DemoKin` incluye los datos para replicar este análisis para el año 1990. Tenga en cuenta que la función permite que el usuario ingrese listas para cada argumento (las listas debne ser consistente en sus dimensiones) o en un formato de data.frame para algunos argumentos. Los datos que vienen incluidos en DemoKin están en este formato (eche un vistazo en R):
 
-- El data.frame `svk_fxs` es la probabilidad de reproducción en cada edad (filas) en cada etapa de paridad (columnas). La primera etapa representa desde la paridad=0 hasta 1; la segunda desde la paridad=1 hasta 2; y así sucesivamente, hasta que finalmente la sexta etapa representa desde la paridad=4 hasta 5 o más.
+- El data.frame `svk_fxs` es la probabilidad de reproducción en cada edad (filas) por cada etapa de paridad (columnas). La primera etapa representa desde la paridad=0 hasta 1; la segunda desde la paridad=1 hasta 2; y así sucesivamente, hasta que finalmente la sexta etapa representa desde la paridad=4 hasta 5 o más.
 - El data.frame `svk_Hxs` tiene una estructura similar pero con $1$ en las edades correspondientes a los recién nacidos (la primera edad en nuestro ejemplo).
 - El data.frame `svk_pxs` tiene la misma estructura y representa las probabilidades de supervivencia.
-- La lista `svk_Uxs` tiene el mismo número de elementos y edades (en este caso 110 clases de edad). Para cada edad, contiene una matriz de transición estocástica de columnas con dimensión para el espacio de estados. Las entradas son probabilidades de transición condicionales a la supervivencia.
+- La lista `svk_Uxs` tiene el mismo número de elementos y edades (en este caso 110 clases de edad). Para cada edad, contiene una matriz estocástica de transición con dimensiones que corresponded al espacio de los estados. Las entradas son probabilidades de transición condicionales a la supervivencia.
 
-Con la función `kin_multi_stage` podemos obtener la estructura cinética conjunta de edad-paridad en un marco temporal invariante, pero en este caso solo devolverá una versión `kin_full`. Por ahora, ejecute el modelo y examine la salida, nos adentraremos en los detalles en la siguiente sección:
+Con la función `kin_multi_stage` podemos obtener la estructura conjunta de edad-paridad en un marco temporal invariante. La funcion solo devolverá la data frame `kin_full` (es decir, `kin_summary` no esta disponible). Por ahora, ejecute el modelo y examine la salida, nos adentraremos en los detalles en la siguiente sección:
 
 ```{r}
 # use birth_female=1 because fertility is for female only
@@ -1819,7 +1821,7 @@ demokin_svk1990 <-
 head(demokin_svk1990)
 ```
 
-Como ejemplo, consideremos la distribución de edad-paridad de las tías, cuando Focal tiene 20 y 60 años (este es un año intermedio en la Figura 4 de Caswell [2021]).
+Como ejemplo, consideremos la distribución de edad-paridad de las tías, cuando Focal tiene 20 y 60 años (similar a la Figura 4 de Caswell [2021]).
 
 ```{r, message=FALSE, warning=FALSE, fig.height=6, fig.width=10}
 demokin_svk1990 %>%
@@ -1838,8 +1840,7 @@ demokin_svk1990 %>%
 ```
 
 
-
-También podemos ver la proporción de hijas y madres vivas en diferentes etapas de paridad a lo largo de la vida de Focal (esto es equivalente a la Figura 9 y 10 en Caswell [2021] pero para un año intermedio).
+También podemos ver la proporción de hijas y madres vivas en diferentes etapas de paridad a lo largo de la vida de Focal (esto es equivalente a la Figura 9 y 10 en Caswell [2021]).
 
 ```{r, message=FALSE, warning=FALSE, fig.height=6, fig.width=10}
 demokin_svk1990 %>%
@@ -1857,13 +1858,13 @@ demokin_svk1990 %>%
   facet_wrap(~kin, nrow = 2)
 ```
 
-**Piensa**: ¿Qué otros tipos de indicadores son interesantes en este contexto?
+**Piensa**: ¿Qué otros tipos de indicadores podrian ser interesantes para modelos mutiestado?
 
 ### Ejercicios {#exercises_thurs11}
 
-Ahora vamos a obtener los datos, construir las listas necesarias y ejecutar el modelo. Debe elegir su propio país con tasas de condición de paridad disponibles en el archivo de datos *"data/fert_cond.Rdata"*, que se obtuvo de HFD. Luego, obtenga la probabilidad de supervivencia de la ONU (asumiremos que la mortalidad es la misma para todas las etapas de paridad). Recuerde que vamos a aplicar el modelo en un marco de tiempo invariante de un solo sexo, así que elija un año para el país.
+Ahora vamos a obtener los datos, construir las listas necesarias y ejecutar un modelo multiestado. Debe elegir su propio país de entre los paises que tienen tasas de fecundidad por paridad. Estos paises estan disponibles en el archivo de datos *"data/fert_cond.Rdata"*, que se obtuvo de HFD. Luego, obtenga la probabilidad de supervivencia de la ONU (asumiremos que la mortalidad es la misma para todas las etapas de paridad). Recuerde que vamos a aplicar el modelo en un marco de tiempo invariante de un solo sexo, así que elija un año para el país.
 
-Para mostrar paso a paso, aquí hay un ejemplo con los Estados Unidos de América. Obtengamos las tasas en cada paridad (por ejemplo, `m1x` es la tasa de transición de 0 a 1 paridad).
+Para mostrar paso a paso, aquí hay un ejemplo con los Estados Unidos de América. Primero, obtenemos las tasas en cada paridad (por ejemplo, `m1x` es la tasa de transición de paridad 0 a 1).
 
 ```{r}
 # fertility by parity
@@ -1888,7 +1889,7 @@ usa_2015_surv <- data_usa_2015 %>%
 
 ```
 
-Fuente las funciones en el archivo *"docs/kin_multi_stage.R"* para traducir los datos a un formato de lista y usarlos como entradas en la función `DemoKin`.
+Cargue las funciones guardadas en el archivo *"docs/kin_multi_stage.R"* para traducir los datos a un formato de lista y usarlos como entradas en la función `DemoKin`.
 
 ```{r}
 source("../docs/kin_multi_stage.R")
